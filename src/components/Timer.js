@@ -1,19 +1,24 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuiz } from "../contexts/QuizContext";
 
+const SECS_PER_QUESTION = 1;
+
 function Timer() {
-  const { dispatch, secondsRemaining } = useQuiz();
-  const mins = Math.floor(secondsRemaining / 60);
-  const seconds = secondsRemaining % 60;
+  const { numQuestions } = useQuiz();
+  const { dispatch } = useQuiz();
+  const [timer, setTimer] = useState(numQuestions * SECS_PER_QUESTION);
+  const mins = Math.floor(timer / 60);
+  const seconds = timer % 60;
 
   useEffect(
     function () {
       const id = setInterval(() => {
-        dispatch({ type: "tick" });
+        setTimer((tick) => tick - 1);
       }, 1000);
+      if (mins === 0 && seconds === 0) return dispatch({ type: "finish" });
       return () => clearInterval(id);
     },
-    [dispatch]
+    [dispatch, mins, seconds]
   );
 
   return (

@@ -2,8 +2,6 @@ import { createContext, useContext, useReducer, useEffect } from "react";
 
 const QuizContext = createContext();
 
-const SECS_PER_QUESTION = 30;
-
 const initialState = {
   questions: [],
   // loading, error, ready, active, finished
@@ -12,7 +10,6 @@ const initialState = {
   answer: null,
   points: 0,
   highscore: 0,
-  secondsRemaining: null,
 };
 
 function reducer(state, action) {
@@ -25,7 +22,6 @@ function reducer(state, action) {
       return {
         ...state,
         status: "active",
-        secondsRemaining: state.questions.length * SECS_PER_QUESTION,
       };
     case "newAnswer":
       const question = state.questions.at(state.index);
@@ -52,16 +48,6 @@ function reducer(state, action) {
         status: "ready",
         questions: state.questions,
         highscore: state.highscore,
-      };
-    case "tick":
-      return {
-        ...state,
-        secondsRemaining: state.secondsRemaining - 1,
-        status: state.secondsRemaining === 0 ? "finished" : state.status,
-        highscore:
-          state.secondsRemaining === 0
-            ? Math.max(state.points, state.highscore)
-            : state.highscore,
       };
     default:
       throw new Error("Action is unknown");
@@ -102,7 +88,6 @@ function QuizProvider({ children }) {
         index,
         answer,
         points,
-        secondsRemaining,
         highscore,
         dispatch,
         numQuestions,
